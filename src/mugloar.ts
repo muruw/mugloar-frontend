@@ -54,6 +54,14 @@ export interface ShopItemPurchase {
   turn: number;
 }
 
+/**
+ * Everything the API has told us about this game so far.
+ *
+ * Because there is no single endpoint that tells us how many lives or gold the player has,
+ * we merge all api responses together into game state and thus type is like it is.
+ */
+export type GameState = NewGame & Partial<SolveMessageAttempt & ShopItemPurchase>
+
 /** Start a new game. */
 export function startGame(): Promise<NewGame> {
   return request<NewGame>('POST', '/game/start')

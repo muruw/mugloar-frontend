@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 
+import { Badge } from '@/components/ui/8bit/badge'
 import { Spinner } from '@/components/ui/8bit/spinner'
-import { getMessages, type Message, type NewGame } from '@/mugloar'
+import { getMessages, type GameState, type Message } from '@/mugloar'
 import { QuestBoard } from '@/quest-board'
 import { Screen } from '@/screen'
+import { StatusPanel } from '@/status-panel'
 
 export interface GameScreenProps {
-  game: NewGame
+  game: GameState
 }
 
 export function GameScreen({ game }: GameScreenProps) {
@@ -28,10 +30,12 @@ export function GameScreen({ game }: GameScreenProps) {
 
   return (
     <Screen>
-      <header className="flex flex-col gap-3">
+      <header className="flex flex-col items-center gap-4">
         <h1 className="text-xl leading-relaxed uppercase">Game</h1>
-        <p className="text-xs leading-loose">Game ID: {game.gameId}</p>
+        <Badge className="text-[9px]">{game.gameId}</Badge>
       </header>
+
+      <StatusPanel game={game} />
 
       {error != null ? (
         <p role="alert" className="text-[10px] leading-loose opacity-75">
