@@ -9,7 +9,15 @@ function App() {
   // is no server and a refresh starts over
   const [game, setGame] = useState<GameState>()
 
-  return game == null ? <StartScreen onStarted={setGame} /> : <GameScreen game={game} />
+  function mergeResult(result: Partial<GameState>) {
+    setGame((previous) => previous && { ...previous, ...result })
+  }
+
+  return game == null ? (
+    <StartScreen onStarted={setGame} />
+  ) : (
+    <GameScreen game={game} onResult={mergeResult} onRestart={() => setGame(undefined)} />
+  )
 }
 
 export default App

@@ -1,32 +1,49 @@
-import { useEffect, useState } from 'react'
+import { useState, type ReactNode } from 'react'
 
 import { Badge } from '@/components/ui/8bit/badge'
+import { Button } from '@/components/ui/8bit/button'
 import { Spinner } from '@/components/ui/8bit/spinner'
-import { getMessages, type GameState, type Message } from '@/mugloar'
+import { getMessages, getShopItems, purchaseShopItem, type GameState, type ShopItem } from '@/mugloar'
 import { QuestBoard } from '@/quest-board'
 import { Screen } from '@/screen'
+import { ShopBoard } from '@/shop-board'
 import { StatusPanel } from '@/status-panel'
+import { useBoard } from '@/use-board'
 
 export interface GameScreenProps {
   game: GameState
+  onResult: (result: Partial<GameState>) => void
+  onRestart: () => void
 }
 
-export function GameScreen({ game }: GameScreenProps) {
-  const [quests, setQuests] = useState<Message[]>()
-  const [error, setError] = useState<string>()
+export function GameScreen({ game, onResult, onRestart }: GameScreenProps) {
+  const { gameId } = game
 
-  useEffect(() => {
-    let current = true
+  const quests = useBoard(gameId, getMessages)
+  const shop = useBoard(gameId, getShopItems)
 
-    getMessages(game.gameId).then(
-      (messages) => current && setQuests(messages),
-      (cause: unknown) => current && setError(cause instanceof Error ? cause.message : String(cause)),
-    )
+  const [busy, setBusy] = useState(false)
+  const [lastTurn, setLastTurn] = useState<string>()
 
-    return () => {
-      current = false
+  const gameOver = game.lives === 0
+
+  async function buy(item: ShopItem) {
+    setBusy(true)
+
+    try {
+      const { shoppingSuccess, ...numbers } = await purchaseShopItem(gameId, item.id)
+
+      onResult(numbers)
+      setLastTurn(shoppingSuccess ? `You bought ${item.name}.` : `You could not buy ${item.name}.`)
+    } catch (cause) {
+      setLastTurn(cause instanceof Error ? cause.message : String(cause))
     }
-  }, [game.gameId])
+
+    // The turn was spent whether or not the purchase worked, so every quest has
+    // aged by one and some of them are gone.
+    await quests.refresh()
+    setBusy(false)
+  }
 
   return (
     <Screen>
@@ -37,20 +54,61 @@ export function GameScreen({ game }: GameScreenProps) {
 
       <StatusPanel game={game} />
 
-      {error != null ? (
-        <p role="alert" className="text-[10px] leading-loose opacity-75">
-          {error}
+      {lastTurn != null && (
+        <p role="status" className="text-[10px] leading-loose opacity-75">
+          {lastTurn}
         </p>
-      ) : quests == null ? (
+      )}
+
+      {gameOver ? (
+        <section className="flex flex-col items-center gap-8">
+          <h2 className="text-base leading-relaxed uppercase">Game over</h2>
+          <p className="text-[10px] leading-loose opacity-75">
+            You finished with {game.score} point{game.score === 1 ? '' : 's'}.
+          </p>
+          <Button size="lg" onClick={onRestart}>
+            Play again
+          </Button>
+        </section>
+      ) : quests.loading || shop.loading ? (
         <p className="flex items-center gap-3 text-[10px] leading-loose opacity-75">
           <Spinner aria-hidden className="size-4" />
           Reading..
         </p>
-      ) : quests.length === 0 ? (
-        <p className="text-[10px] leading-loose opacity-75">The message board is empty.</p>
       ) : (
-        <QuestBoard quests={quests} />
+        <>
+          <BoardState error={quests.error} items={quests.items} empty="The message board is empty.">
+            {(items) => <QuestBoard quests={items} busy={busy} />}
+          </BoardState>
+
+          <BoardState error={shop.error} items={shop.items} empty="The shop has been fully looted.">
+            {(items) => <ShopBoard items={items} busy={busy} onBuy={buy} />}
+          </BoardState>
+        </>
       )}
     </Screen>
   )
+}
+
+interface BoardStateProps<T> {
+  items: T[] | undefined
+  error: string | undefined
+  empty: string
+  children: (items: T[]) => ReactNode
+}
+
+function BoardState<T>({ items, error, empty, children }: BoardStateProps<T>) {
+  if (error != null) {
+    return (
+      <p role="alert" className="text-[10px] leading-loose opacity-75">
+        {error}
+      </p>
+    )
+  }
+
+  if (items == null || items.length === 0) {
+    return <p className="text-[10px] leading-loose opacity-75">{empty}</p>
+  }
+
+  return <>{children(items)}</>
 }

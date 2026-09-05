@@ -26,32 +26,34 @@ export interface Reputation {
 export interface Message {
   adId: string
   message: string
-  reward: string
+  reward: number
   expiresIn: number
+  /** Undocumented. The odds of solving it, e.g. "Piece of cake". */
+  probability: string
 }
 
 export interface SolveMessageAttempt {
-  success: boolean;
-  lives: number;
-  gold: number;
-  score: number;
-  highScore: number;
-  turn: number;
-  message: string;
+  success: boolean
+  lives: number
+  gold: number
+  score: number
+  highScore: number
+  turn: number
+  message: string
 }
 
 export interface ShopItem {
-  id: string;
-  name: string;
-  cost: number;
+  id: string
+  name: string
+  cost: number
 }
 
 export interface ShopItemPurchase {
-  shoppingSuccess: string;
-  gold: number;
-  lives: number;
-  level: number;
-  turn: number;
+  shoppingSuccess: boolean
+  gold: number
+  lives: number
+  level: number
+  turn: number
 }
 
 /**
@@ -60,14 +62,14 @@ export interface ShopItemPurchase {
  * Because there is no single endpoint that tells us how many lives or gold the player has,
  * we merge all api responses together into game state and thus type is like it is.
  */
-export type GameState = NewGame & Partial<SolveMessageAttempt & ShopItemPurchase>
+export type GameState = NewGame
 
 /** Start a new game. */
 export function startGame(): Promise<NewGame> {
   return request<NewGame>('POST', '/game/start')
 }
 
-/** Run an investigation about your reputation. */
+/** Run an investigation about your reputation. Costs a turn, as the actions do. */
 export function investigateReputation(gameId: string): Promise<Reputation> {
   return request<Reputation>('POST', `/${gameId}/investigate/reputation`)
 }
@@ -78,25 +80,30 @@ export function getMessages(gameId: string): Promise<Message[]> {
 }
 
 /** Try to solve one of the messages from message board. */
-export function solveMessage(gameId: string, adId: String): Promise<SolveMessageAttempt> {
-  return request<SolveMessageAttempt>("POST", `/${gameId}/solve/${adId}`)
+export function solveMessage(gameId: string, adId: string): Promise<SolveMessageAttempt> {
+  return request<SolveMessageAttempt>('POST', `/${gameId}/solve/${adId}`)
 }
 
-/** Get the listing of items available in shop */
+/** Get the listing of items available in shop. It does not change during a game. */
 export function getShopItems(gameId: string): Promise<ShopItem[]> {
-  return request<ShopItem[]>("GET", `${gameId}/shop`);
+  return request<ShopItem[]>('GET', `/${gameId}/shop`)
 }
 
-/** Purchase an item */
+/** Purchase an item. Costs a turn even when the purchase fails. */
 export function purchaseShopItem(gameId: string, itemId: string): Promise<ShopItemPurchase> {
-  return request<ShopItemPurchase>("POST", `/${gameId}/shop/buy/${itemId}`);
+  return request<ShopItemPurchase>('POST', `/${gameId}/shop/buy/${itemId}`)
 }
 
 async function request<T>(method: 'GET' | 'POST', path: string): Promise<T> {
-  let response = await fetch(`${API_BASE_URL}${path}`, { method })
+  const response = await fetch(`${API_BASE_URL}${path}`, { method })
 
   if (!response.ok) {
-    throw new Error(`Mugloar API ${method} ${path} failed: ${response.status} ${response.statusText}`)
+    // Every endpoint answers 410 once the player is out of lives.
+    throw new Error(
+      response.status === 410
+        ? 'This game is over.'
+        : `The game server said ${response.status} ${response.statusText}.`,
+    )
   }
 
   return (await response.json()) as T
