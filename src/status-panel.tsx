@@ -1,12 +1,26 @@
+import { Button } from '@/components/ui/8bit/button'
 import { Card, CardContent } from '@/components/ui/8bit/card'
-import type { GameState } from '@/mugloar'
+import type { GameState, Reputation } from '@/mugloar'
+
+export type ReputationReading = Reputation & { turn: number }
 
 export interface StatusPanelProps {
   game: GameState
+  /** The last reading, or undefined if the player has not investigated yet. */
+  reputation?: ReputationReading
+  busy: boolean
+  gameOver: boolean
+  onInvestigate: () => void
 }
 
 /** player stats/statuses */
-export function StatusPanel({ game }: StatusPanelProps) {
+export function StatusPanel({
+  game,
+  reputation,
+  busy,
+  gameOver,
+  onInvestigate,
+}: StatusPanelProps) {
   return (
     <section className="flex w-full max-w-[1100px] flex-col gap-8 text-left">
       <Card>
@@ -18,6 +32,29 @@ export function StatusPanel({ game }: StatusPanelProps) {
             <Stat label="Level" value={game.level} />
             <Stat label="Turn" value={game.turn} />
           </dl>
+
+          <div className="flex flex-col gap-5 border-t pt-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-baseline gap-3">
+                <h2 className="text-[8px] uppercase opacity-55">Reputation</h2>
+                <span className="text-[8px] opacity-55">
+                  {reputation == null ? 'Not checked yet' : `as of turn ${reputation.turn}`}
+                </span>
+              </div>
+
+              {!gameOver && (
+                <Button size="sm" disabled={busy} onClick={onInvestigate}>
+                  Investigate
+                </Button>
+              )}
+            </div>
+
+            <dl className="grid grid-cols-3 gap-x-6 gap-y-5">
+              <Stat label="People" value={reputation?.people ?? '—'} />
+              <Stat label="State" value={reputation?.state ?? '—'} />
+              <Stat label="Underworld" value={reputation?.underworld ?? '—'} />
+            </dl>
+          </div>
         </CardContent>
       </Card>
     </section>
@@ -26,7 +63,7 @@ export function StatusPanel({ game }: StatusPanelProps) {
 
 interface StatProps {
   label: string
-  value: number
+  value: number | string
   textColor?: string
 }
 

@@ -6,6 +6,7 @@ import { Spinner } from '@/components/ui/8bit/spinner'
 import {
   getMessages,
   getShopItems,
+  investigateReputation,
   purchaseShopItem,
   solveMessage,
   type GameState,
@@ -15,7 +16,7 @@ import {
 import { QuestBoard } from '@/quest-board'
 import { Screen } from '@/screen'
 import { ShopBoard } from '@/shop-board'
-import { StatusPanel } from '@/status-panel'
+import { StatusPanel, type ReputationReading } from '@/status-panel'
 import { useBoard } from '@/use-board'
 
 export interface GameScreenProps {
@@ -32,8 +33,31 @@ export function GameScreen({ game, onResult, onRestart }: GameScreenProps) {
 
   const [busy, setBusy] = useState(false)
   const [lastTurn, setLastTurn] = useState<string>()
+  const [reputation, setReputation] = useState<ReputationReading>()
 
   const gameOver = game.lives === 0
+
+  async function investigate() {
+    setBusy(true)
+
+    try {
+      const reading = await investigateReputation(gameId)
+
+      // The reply carries no numbers, so count the spent turn here. The next
+      // solve or buy overwrites it with the server's own count.
+      const turn = game.turn + 1
+
+      onResult({ turn })
+      setReputation({ ...reading, turn })
+      setLastTurn('You investigated your reputation. That cost a turn.')
+    } catch (cause) {
+      setLastTurn(cause instanceof Error ? cause.message : String(cause))
+    }
+
+    // refresh because turn is spent
+    await quests.refresh()
+    setBusy(false)
+  }
 
   async function solve(quest: Message) {
     setBusy(true)
@@ -76,7 +100,13 @@ export function GameScreen({ game, onResult, onRestart }: GameScreenProps) {
         <Badge className="text-[9px]">{game.gameId}</Badge>
       </header>
 
-      <StatusPanel game={game} />
+      <StatusPanel
+        game={game}
+        reputation={reputation}
+        busy={busy}
+        gameOver={gameOver}
+        onInvestigate={investigate}
+      />
 
       {lastTurn != null && (
         <p role="status" className="text-[10px] leading-loose opacity-75">
