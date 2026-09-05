@@ -3,7 +3,15 @@ import { useState, type ReactNode } from 'react'
 import { Badge } from '@/components/ui/8bit/badge'
 import { Button } from '@/components/ui/8bit/button'
 import { Spinner } from '@/components/ui/8bit/spinner'
-import { getMessages, getShopItems, purchaseShopItem, type GameState, type ShopItem } from '@/mugloar'
+import {
+  getMessages,
+  getShopItems,
+  purchaseShopItem,
+  solveMessage,
+  type GameState,
+  type Message,
+  type ShopItem,
+} from '@/mugloar'
 import { QuestBoard } from '@/quest-board'
 import { Screen } from '@/screen'
 import { ShopBoard } from '@/shop-board'
@@ -27,6 +35,23 @@ export function GameScreen({ game, onResult, onRestart }: GameScreenProps) {
 
   const gameOver = game.lives === 0
 
+  async function solve(quest: Message) {
+    setBusy(true)
+
+    try {
+      const { success: _success, message, ...numbers } = await solveMessage(gameId, quest.adId)
+
+      onResult(numbers)
+      setLastTurn(message)
+    } catch (cause) {
+      setLastTurn(cause instanceof Error ? cause.message : String(cause))
+    }
+
+    // refresh because turn is spent
+    await quests.refresh()
+    setBusy(false)
+  }
+
   async function buy(item: ShopItem) {
     setBusy(true)
 
@@ -39,8 +64,7 @@ export function GameScreen({ game, onResult, onRestart }: GameScreenProps) {
       setLastTurn(cause instanceof Error ? cause.message : String(cause))
     }
 
-    // The turn was spent whether or not the purchase worked, so every quest has
-    // aged by one and some of them are gone.
+    // refresh because turn is spent
     await quests.refresh()
     setBusy(false)
   }
@@ -78,7 +102,7 @@ export function GameScreen({ game, onResult, onRestart }: GameScreenProps) {
       ) : (
         <>
           <BoardState error={quests.error} items={quests.items} empty="The message board is empty.">
-            {(items) => <QuestBoard quests={items} busy={busy} />}
+            {(items) => <QuestBoard quests={items} busy={busy} onSolve={solve} />}
           </BoardState>
 
           <BoardState error={shop.error} items={shop.items} empty="The shop has been fully looted.">

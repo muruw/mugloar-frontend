@@ -6,9 +6,10 @@ import type { Message } from '@/mugloar'
 export interface QuestBoardProps {
   quests: Message[]
   busy: boolean
+  onSolve: (quest: Message) => void
 }
 
-export function QuestBoard({ quests, busy }: QuestBoardProps) {
+export function QuestBoard({ quests, busy, onSolve }: QuestBoardProps) {
   return (
     <CardCarousel
       label="Quests"
@@ -18,7 +19,7 @@ export function QuestBoard({ quests, busy }: QuestBoardProps) {
       items={quests}
       keyOf={(quest) => quest.adId}
     >
-      {(quest) => <QuestCard quest={quest} busy={busy} />}
+      {(quest) => <QuestCard quest={quest} busy={busy} onSolve={onSolve} />}
     </CardCarousel>
   )
 }
@@ -26,9 +27,10 @@ export function QuestBoard({ quests, busy }: QuestBoardProps) {
 interface QuestCardProps {
   quest: Message
   busy: boolean
+  onSolve: (quest: Message) => void
 }
 
-function QuestCard({ quest, busy }: QuestCardProps) {
+function QuestCard({ quest, busy, onSolve }: QuestCardProps) {
   const { adId, message, reward, expiresIn, probability } = quest
 
   return (
@@ -48,7 +50,12 @@ function QuestCard({ quest, busy }: QuestCardProps) {
 
       <CardFooter className="flex flex-wrap items-center justify-between gap-3 border-t bg-muted/50 p-(--card-spacing)">
         <span className="text-[8px] opacity-55">#{adId}</span>
-        <Button size="sm" disabled={busy} aria-label={`Solve quest ${adId}`}>
+        <Button
+          size="sm"
+          disabled={busy}
+          aria-label={`Solve quest ${adId}`}
+          onClick={() => onSolve(quest)}
+        >
           Solve
         </Button>
       </CardFooter>
