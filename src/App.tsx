@@ -1,10 +1,12 @@
-import './App.css'
+import { Button } from '@/components/ui/8bit/button'
+import { Screen } from '@/screen'
 
 function App() {
   return (
-    <>
-      <h1>Hello world!</h1>
-    </>
+    <Screen>
+      <h1 className="text-xl leading-relaxed uppercase">Dragons of Mugloar</h1>
+      <Button size="lg">Start game</Button>
+    </Screen>
   )
 }
 
