@@ -98,6 +98,7 @@ export function GameScreen({ game, onResult, onRestart }: GameScreenProps) {
       <header className="flex flex-col items-center gap-4">
         <h1 className="text-xl leading-relaxed uppercase">Game</h1>
         <Badge className="text-[9px]">{game.gameId}</Badge>
+        <p className="text-[8px] leading-loose opacity-55">Refreshing restarts the game.</p>
       </header>
 
       <StatusPanel
