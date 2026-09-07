@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { GameScreen } from '@/game-screen'
-import type { GameState } from '@/mugloar'
+import { mergeResponse, type GameState } from '@/mugloar'
 import { StartScreen } from '@/start-screen'
 import { useLeaveWarning } from '@/use-leave-warning'
 
@@ -14,7 +14,7 @@ function App() {
   useLeaveWarning(game != null && game.lives > 0)
 
   function mergeResult(result: Partial<GameState>) {
-    setGame((previous) => previous && { ...previous, ...result })
+    setGame((previous) => previous && mergeResponse(previous, result))
   }
 
   return game == null ? (

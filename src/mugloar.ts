@@ -58,11 +58,16 @@ export interface ShopItemPurchase {
 
 /**
  * Everything the API has told us about this game so far.
- *
+ */
+export type GameState = NewGame
+
+/**
  * Because there is no single endpoint that tells us how many lives or gold the player has,
  * we merge all api responses together into game state and thus type is like it is.
  */
-export type GameState = NewGame
+export function mergeResponse(game: GameState, response: Partial<GameState>): GameState {
+  return { ...game, ...response }
+}
 
 /** Start a new game. */
 export function startGame(): Promise<NewGame> {
