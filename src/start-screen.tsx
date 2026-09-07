@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/8bit/button'
 import { Spinner } from '@/components/ui/8bit/spinner'
 import { startGame, type NewGame } from '@/mugloar'
 import { Screen } from '@/screen'
+import { Tutorial } from '@/tutorial'
 
 export interface StartScreenProps {
   onStarted: (game: NewGame) => void
@@ -39,6 +40,8 @@ export function StartScreen({ onStarted }: StartScreenProps) {
           {error}
         </p>
       )}
+
+      <Tutorial />
     </Screen>
   )
 }

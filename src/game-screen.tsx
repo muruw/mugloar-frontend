@@ -18,6 +18,7 @@ import { Screen } from '@/screen'
 import { ShopBoard } from '@/shop-board'
 import { StatusPanel, type ReputationReading } from '@/status-panel'
 import { useBoard } from '@/use-board'
+import {Tutorial} from "@/tutorial.tsx";
 
 export interface GameScreenProps {
   game: GameState
@@ -99,6 +100,8 @@ export function GameScreen({ game, onResult, onRestart }: GameScreenProps) {
         <h1 className="text-xl leading-relaxed uppercase">Game</h1>
         <Badge className="text-[9px]">{game.gameId}</Badge>
         <p className="text-[8px] leading-loose opacity-55">Refreshing restarts the game.</p>
+
+        <Tutorial />
       </header>
 
       <StatusPanel
