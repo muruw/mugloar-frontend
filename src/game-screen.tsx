@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 
 import { Badge } from '@/components/ui/8bit/badge'
 import { Button } from '@/components/ui/8bit/button'
+import { Card, CardContent } from '@/components/ui/8bit/card'
 import { Spinner } from '@/components/ui/8bit/spinner'
 import {
   getMessages,
@@ -112,11 +113,18 @@ export function GameScreen({ game, onResult, onRestart }: GameScreenProps) {
         onInvestigate={investigate}
       />
 
-      {lastTurn != null && (
-        <p role="status" className="text-[10px] leading-loose opacity-75">
-          {lastTurn}
-        </p>
-      )}
+      <section role="status" aria-live="polite" className="w-full max-w-[1100px]">
+        {lastTurn != null && (
+          // Keyed on the turn so it replays the fade, otherwise solving the same
+          // quest twice looks like nothing happened.
+          <Card key={game.turn} className="motion-safe:animate-in fade-in slide-in-from-bottom-1 duration-300">
+            <CardContent className="flex flex-wrap items-baseline gap-x-4 gap-y-3 px-(--card-spacing) text-left">
+              <span className="text-[8px] uppercase opacity-55">Turn {game.turn}</span>
+              <p className="flex-1 text-[10px] leading-loose [overflow-wrap:anywhere]">{lastTurn}</p>
+            </CardContent>
+          </Card>
+        )}
+      </section>
 
       {gameOver ? (
         <section className="flex flex-col items-center gap-8">
