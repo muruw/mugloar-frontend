@@ -1,32 +1,50 @@
-# React + TypeScript + Vite
+# Dragons of Mugloar
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Bigbank FE home assignment
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Running it
 
-## React Compiler
+Node 22.12 or newer.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```sh
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Then open http://localhost:5173
+
+## Commands
+
+- `npm run dev` — run it locally
+- `npm run build` — build into `dist/`
+- `npm test` — run the tests
+- `npm run lint` — check the code
+
+## Functionality
+
+- Start a new game
+- Show the quests on the message board, with reward, odds and turns left
+- Attempt to solve quests
+- Buy items from the shop
+- Show lives, gold, score, level and turn, updated after every turn
+- Check your reputation with factions
+- Show a final score and a "play again" button when you run out of lives
+
+## How it is put together
+
+- React, TypeScript and Vite. UI component library [8bitcn](https://www.8bitcn.com/).
+- static website, uses public Dragons of Mugloar API for game logic.
+- The game API is the only source for lives, gold and score. Those numbers are
+  never worked out in the app, only copied from whatever the API last said.
+- Game uses `mergeResponse` in `src/mugloar.ts` because there is no GET endpoint to get all stats, 
+  nor any single endpoint returns all stats.
+
+## Known missing functionality / TODO
+
+- **Some quests are not readable and solvable.** Their id is also scrambled and thus it's not possible to solve them. 
+  Decoding them is understood but not built.
+- **The shop is only loaded once per game.** I ran the api multiple times and it seems that the item list doesn't change.
+  For optimization, the shop list is fetched at the start of the game.
+- **Refreshing the page starts a new game.** Nothing is saved anywhere. The
+  browser asks you to confirm before you lose a game in progress.
