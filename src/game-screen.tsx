@@ -137,7 +137,7 @@ export function GameScreen({ game, onResult, onRestart }: GameScreenProps) {
           </BoardState>
 
           <BoardState error={shop.error} items={shop.items} empty="The shop has been fully looted.">
-            {(items) => <ShopBoard items={items} busy={busy} onBuy={buy} />}
+            {(items) => <ShopBoard items={items} playerGold={game.gold} busy={busy} onBuy={buy} />}
           </BoardState>
         </>
       )}

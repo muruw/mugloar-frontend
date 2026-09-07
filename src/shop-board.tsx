@@ -5,11 +5,12 @@ import type { ShopItem } from '@/mugloar'
 
 export interface ShopBoardProps {
   items: ShopItem[]
+  playerGold: number
   busy: boolean
   onBuy: (item: ShopItem) => void
 }
 
-export function ShopBoard({ items, busy, onBuy }: ShopBoardProps) {
+export function ShopBoard({ items, playerGold, busy, onBuy }: ShopBoardProps) {
   return (
     <CardCarousel
       label="Shop items"
@@ -19,24 +20,28 @@ export function ShopBoard({ items, busy, onBuy }: ShopBoardProps) {
       items={items}
       keyOf={(item) => item.id}
     >
-      {(item) => <ShopItemCard item={item} busy={busy} onBuy={onBuy} />}
+      {(item) => <ShopItemCard item={item} playerGold={playerGold} busy={busy} onBuy={onBuy} />}
     </CardCarousel>
   )
 }
 
 interface ShopItemCardProps {
   item: ShopItem
+  playerGold: number
   busy: boolean
   onBuy: (item: ShopItem) => void
 }
 
-function ShopItemCard({ item, busy, onBuy }: ShopItemCardProps) {
+function ShopItemCard({ item, playerGold, busy, onBuy }: ShopItemCardProps) {
   const { id, name, cost } = item
+
+  const canBuy = playerGold >= cost
 
   return (
     <Card className="h-full text-left">
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 text-[10px] leading-relaxed">
         <span>{cost} G</span>
+        {!canBuy && <span className="opacity-70">{cost - playerGold} G short</span>}
       </CardHeader>
 
       <CardContent className="flex-1 px-(--card-spacing) text-[10px] leading-loose">
@@ -45,7 +50,12 @@ function ShopItemCard({ item, busy, onBuy }: ShopItemCardProps) {
 
       <CardFooter className="flex flex-wrap items-center justify-between gap-3 border-t bg-muted/50 p-(--card-spacing)">
         <span className="text-[8px] opacity-55">#{id}</span>
-        <Button size="sm" disabled={busy} aria-label={`Buy ${name}`} onClick={() => onBuy(item)}>
+        <Button
+          size="sm"
+          disabled={busy || !canBuy}
+          aria-label={`Buy ${name}`}
+          onClick={() => onBuy(item)}
+        >
           Buy
         </Button>
       </CardFooter>
