@@ -30,7 +30,15 @@ export interface Message {
   expiresIn: number
   /** Undocumented. The odds of solving it, e.g. "Piece of cake". */
   probability: string
+  /** Undocumented. Which cipher the ad arrived in, or null for a plain one. */
+  encrypted: Cipher | null
 }
+
+/**
+ * Undocumented. Some ads arrive scrambled, and this names the cipher used:
+ * 1 is base64, 2 is ROT13. Roughly one ad in eight is encrypted.
+ */
+export type Cipher = 1 | 2
 
 export interface SolveMessageAttempt {
   success: boolean
@@ -79,9 +87,57 @@ export function investigateReputation(gameId: string): Promise<Reputation> {
   return request<Reputation>('POST', `/${gameId}/investigate/reputation`)
 }
 
-/** Get all messages from the message board. */
-export function getMessages(gameId: string): Promise<Message[]> {
-  return request<Message[]>('GET', `/${gameId}/messages`)
+/**
+ * Get all messages from the message board.
+ *
+ * This also includes decoding of ads that are unreadable otherwise.
+ */
+export async function getMessages(gameId: string): Promise<Message[]> {
+  const messages = await request<Message[]>('GET', `/${gameId}/messages`)
+
+  return messages.map(decodeMessage)
+      .filter((message: Message) => message != null)
+}
+
+/**
+ * Decode an ad, or throw error if type is unknown.
+ *
+ * The adId is scrambled along with the text, and the game rejects a scrambled
+ * one with 400, so an ad we cannot read is also an ad we cannot solve.
+ */
+export function decodeMessage(message: Message): Message{
+  const { encrypted } = message
+
+  if (encrypted == null) return message
+  if (encrypted !== 1 && encrypted !== 2) throw new Error("Unsupported encryption type");
+
+  return {
+    ...message,
+    adId: decipher(encrypted, message.adId),
+    message: decipher(encrypted, message.message),
+    probability: decipher(encrypted, message.probability),
+  }
+}
+
+function decipher(cipher: Cipher, text: string): string {
+  return cipher === 1 ? fromBase64(text) : rot13(text)
+}
+
+/**
+ * The base64 holds the UTF-8 bytes of the ad text, and atob hands those bytes
+ * back one character each. A letter like "İ" is two bytes, so it arrives as two
+ * characters ("Ä°") unless the bytes are read back as UTF-8.
+ */
+function fromBase64(text: string): string {
+  const bytes = Uint8Array.from(atob(text), (character) => character.charCodeAt(0))
+
+  return new TextDecoder().decode(bytes)
+}
+
+function rot13(s: string) {
+  return s.replace(/[A-Z]/gi, c =>
+      "NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm"[
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".indexOf(c) ] )
 }
 
 /** Try to solve one of the messages from message board. */

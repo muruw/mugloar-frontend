@@ -1,4 +1,5 @@
 import { CardCarousel } from '@/card-carousel'
+import { Badge } from '@/components/ui/8bit/badge'
 import { Button } from '@/components/ui/8bit/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/8bit/card'
 import type { Message } from '@/mugloar'
@@ -31,7 +32,7 @@ interface QuestCardProps {
 }
 
 function QuestCard({ quest, busy, onSolve }: QuestCardProps) {
-  const { adId, message, reward, expiresIn, probability } = quest
+  const { adId, message, reward, expiresIn, probability, encrypted } = quest
 
   return (
     <Card className="h-full text-left">
@@ -49,7 +50,15 @@ function QuestCard({ quest, busy, onSolve }: QuestCardProps) {
       </CardContent>
 
       <CardFooter className="flex flex-wrap items-center justify-between gap-3 border-t bg-muted/50 p-(--card-spacing)">
-        <span className="text-[8px] opacity-55">#{adId}</span>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-[8px] opacity-55">#{adId}</span>
+          {/* The decoding is invisible once done, so say the cipher was broken. */}
+          {encrypted != null && (
+            <Badge variant="secondary" className="text-[8px]">
+              Decoded
+            </Badge>
+          )}
+        </div>
         <Button
           size="sm"
           disabled={busy}

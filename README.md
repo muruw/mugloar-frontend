@@ -25,6 +25,7 @@ Then open http://localhost:5173
 
 - Start a new game
 - Show the quests on the message board, with reward, odds and turns left
+- Decoded the encrypted quests, so they can be read and solved
 - Attempt to solve quests
 - Buy items from the shop
 - Show lives, gold, score, level and turn, updated after every turn
@@ -39,11 +40,20 @@ Then open http://localhost:5173
   never worked out in the app, only copied from whatever the API last said.
 - Game uses `mergeResponse` in `src/mugloar.ts` because there is no GET endpoint to get all stats, 
   nor any single endpoint returns all stats.
+- Encrypted quests are decoded in `getMessages`, so the rest of the app only
+  ever sees plain ones.
+
+## Encrypted quests
+
+Some quests appear to be encrypted. But they have a `encrypted` field.
+
+`encrypted` field: `1` is base64, `2` is rot13.
+
+Because quest id-s are also encrypted, then clicking solve would throw an error because
+the id that is passed to API, is just a scrambled text and API doesn't know what to do with it.
 
 ## Known missing functionality / TODO
 
-- **Some quests are not readable and solvable.** Their id is also scrambled and thus it's not possible to solve them. 
-  Decoding them is understood but not built.
 - **The shop is only loaded once per game.** I ran the api multiple times and it seems that the item list doesn't change.
   For optimization, the shop list is fetched at the start of the game.
 - **Refreshing the page starts a new game.** Nothing is saved anywhere. The
