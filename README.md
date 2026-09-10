@@ -2,6 +2,9 @@
 
 Bigbank FE home assignment
 
+Live version of this site:
+https://dragonsofmugloar.pages.dev/
+
 
 ## Running it
 
@@ -56,5 +59,5 @@ the id that is passed to API, is just a scrambled text and API doesn't know what
 
 - **The shop is only loaded once per game.** I ran the api multiple times and it seems that the item list doesn't change.
   For optimization, the shop list is fetched at the start of the game.
-- **Refreshing the page starts a new game.** Nothing is saved anywhere. The
+- **Refreshing the page starts a new game.** The
   browser asks you to confirm before you lose a game in progress.
