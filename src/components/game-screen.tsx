@@ -1,9 +1,9 @@
 import { useState, type ReactNode } from 'react'
 
-import { Badge } from '@/components/ui/8bit/badge'
-import { Button } from '@/components/ui/8bit/button'
-import { Card, CardContent } from '@/components/ui/8bit/card'
-import { Spinner } from '@/components/ui/8bit/spinner'
+import { Badge } from '@/components/ui/8bit/badge.tsx'
+import { Button } from '@/components/ui/8bit/button.tsx'
+import { Card, CardContent } from '@/components/ui/8bit/card.tsx'
+import { Spinner } from '@/components/ui/8bit/spinner.tsx'
 import {
   getMessages,
   getShopItems,
@@ -13,13 +13,13 @@ import {
   type GameState,
   type Message,
   type ShopItem,
-} from '@/mugloar'
-import { QuestBoard } from '@/quest-board'
-import { Screen } from '@/screen'
-import { ShopBoard } from '@/shop-board'
-import { StatusPanel, type ReputationReading } from '@/status-panel'
-import { useBoard } from '@/use-board'
-import {Tutorial} from "@/tutorial.tsx";
+} from '@/lib/mugloar.ts'
+import { QuestBoard } from '@/components/quest-board.tsx'
+import { Screen } from '@/components/screen.tsx'
+import { ShopBoard } from '@/components/shop-board.tsx'
+import { StatusPanel, type ReputationReading } from '@/components/status-panel.tsx'
+import { useBoard } from '@/hooks/use-board.ts'
+import {Tutorial} from "@/components/tutorial.tsx";
 
 export interface GameScreenProps {
   game: GameState

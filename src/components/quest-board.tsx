@@ -1,8 +1,8 @@
-import { CardCarousel } from '@/card-carousel'
-import { Badge } from '@/components/ui/8bit/badge'
-import { Button } from '@/components/ui/8bit/button'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/8bit/card'
-import type { Message } from '@/mugloar'
+import { CardCarousel } from '@/components/card-carousel.tsx'
+import { Badge } from '@/components/ui/8bit/badge.tsx'
+import { Button } from '@/components/ui/8bit/button.tsx'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/8bit/card.tsx'
+import type { Message } from '@/lib/mugloar.ts'
 
 export interface QuestBoardProps {
   quests: Message[]

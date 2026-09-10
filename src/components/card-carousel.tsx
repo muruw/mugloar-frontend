@@ -6,7 +6,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '@/components/ui/8bit/carousel'
+} from '@/components/ui/8bit/carousel.tsx'
 
 export interface CardCarouselProps<T> {
   label: string

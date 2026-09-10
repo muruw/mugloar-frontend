@@ -1,10 +1,10 @@
 import { useState } from 'react'
 
-import { Button } from '@/components/ui/8bit/button'
-import { Spinner } from '@/components/ui/8bit/spinner'
-import { startGame, type NewGame } from '@/mugloar'
-import { Screen } from '@/screen'
-import { Tutorial } from '@/tutorial'
+import { Button } from '@/components/ui/8bit/button.tsx'
+import { Spinner } from '@/components/ui/8bit/spinner.tsx'
+import { startGame, type NewGame } from '@/lib/mugloar.ts'
+import { Screen } from '@/components/screen.tsx'
+import { Tutorial } from '@/components/tutorial.tsx'
 
 export interface StartScreenProps {
   onStarted: (game: NewGame) => void

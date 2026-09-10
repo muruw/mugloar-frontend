@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/8bit/button'
-import { Card, CardContent } from '@/components/ui/8bit/card'
-import type { GameState, Reputation } from '@/mugloar'
+import { Button } from '@/components/ui/8bit/button.tsx'
+import { Card, CardContent } from '@/components/ui/8bit/card.tsx'
+import type { GameState, Reputation } from '@/lib/mugloar.ts'
 
 export type ReputationReading = Reputation & { turn: number }
 

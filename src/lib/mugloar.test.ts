@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { decodeMessage, mergeResponse, type GameState, type Message } from './mugloar'
+import { decodeMessage, mergeResponse, type GameState, type Message } from './mugloar.ts'
 
 const game: GameState = {
   gameId: 'abc123',

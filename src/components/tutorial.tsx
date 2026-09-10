@@ -1,5 +1,5 @@
-import Feature2, { type FeatureRow } from '@/components/ui/8bit/blocks/feature2'
-import { Button } from '@/components/ui/8bit/button'
+import Feature2, { type FeatureRow } from '@/components/ui/8bit/blocks/feature2.tsx'
+import { Button } from '@/components/ui/8bit/button.tsx'
 import {
   Drawer,
   DrawerClose,
@@ -8,7 +8,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from '@/components/ui/8bit/drawer'
+} from '@/components/ui/8bit/drawer.tsx'
 
 
 const rules: FeatureRow[] = [

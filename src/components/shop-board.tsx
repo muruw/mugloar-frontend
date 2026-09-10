@@ -1,7 +1,7 @@
-import { CardCarousel } from '@/card-carousel'
-import { Button } from '@/components/ui/8bit/button'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/8bit/card'
-import type { ShopItem } from '@/mugloar'
+import { CardCarousel } from '@/components/card-carousel.tsx'
+import { Button } from '@/components/ui/8bit/button.tsx'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/8bit/card.tsx'
+import type { ShopItem } from '@/lib/mugloar.ts'
 
 export interface ShopBoardProps {
   items: ShopItem[]
